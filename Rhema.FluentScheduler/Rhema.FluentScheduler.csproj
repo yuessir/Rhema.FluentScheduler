@@ -63,7 +63,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="RhemaJobEndInfo.cs" />
-    <Compile Include="RhemaJobStartInfo.cs" />
     <Compile Include="RhemaTask.cs" />
     <Compile Include="ExecutionContextExt.cs" />
     <Compile Include="IContextEngine.cs" />

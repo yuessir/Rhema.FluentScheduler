@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Autofac;
@@ -38,36 +39,7 @@ namespace FluentScheduler.UnitTests
 
         }
 
-        [Fact]
-        public void Should_JobEngine_WithRegistry_WORKED()
-        {
-            // Arrange
-            var input = new DateTime(2000, 1, 1, 1, 23, 0);
-            var expected = new DateTime(2000, 1, 1, 1, 24, 0);
-            var eng = Container.Resolve<IScheduleJobEngine>();
-            // Act
-            eng.WithRegistry(new TaskRegistry());
-
-            var s = JobManager.GetSchedule("TestJob");
-            var actual = s.CalculateNextRun(input);
-
-            //Assert
-            Equal(expected, actual);
-         
-        }
-        [Fact]
-        public void Should_JobEngine_WithRegistry_JobEnd_WORKED()
-        {
-            // Arrange
-            var eng = Container.Resolve<IScheduleJobEngine>();
-            // Act
-            eng.WithRegistry(new TaskRegistry()).JobEnd("expected", Test2);
-            JobManager.StopAndBlock();
-
-            //Assert
-            Equal(2, test2ActionTimers);
-            Equal("expected", test2expectedval);
-        }
+       
 
         [Fact]
         public void Should_JobEngine_AddJob_WORKED()
@@ -99,17 +71,55 @@ namespace FluentScheduler.UnitTests
                 {
                     //nothing
                 },
-                s => s.WithName("TestJob8").ToRunNow()).JobEnd("1", Test1);
+                s => s.WithName("TestJob8").ToRunNow()).JobEnd(new JobEndData<string>() { Data = "1" }, Test1);
+            eng.Run();
 
-            JobManager.StopAndBlock();
+            eng.Stop();
+
+            //Assert
+            Equal("1", test1expectedval);
+        }
+        [Fact]
+        public void Should_JobEngine_AddJob_NONAME_JobEnd_WORKED()
+        {
+            // Arrange
+            var eng = Container.Resolve<IScheduleJobEngine>();
+            // Act
+            eng.AddJob(() =>
+                {
+                    //nothing
+                },
+                s => s.ToRunOnceIn(60).Seconds()).JobEnd(new JobEndData<string>() { Data = "1" }, Test1);
+            eng.Run();
+
+            eng.Stop();
+
+            //Assert
+            Equal("1", test1expectedval);
+        }
+        [Fact]
+        public void Should_JobEngine_AddJob_NONAME_ToRunNow_JobEnd_WORKED()
+        {
+            // Arrange
+            var eng = Container.Resolve<IScheduleJobEngine>();
+            // Act
+            eng.AddJob(() =>
+                {
+                    //nothing
+                },
+                s => s.ToRunNow()).JobEnd(new JobEndData<string>() { Data = "1" }, Test1);
+            eng.Run();
+
+
+            eng.Stop();
             //Assert
             Equal("1", test1expectedval);
         }
 
-        public  object Test1(RhemaJobEndInfo info, object val)
+        public  object Test1(JobEndData<string> info)
         {
-            test1expectedval = val.ToString();
-            info.Stop(info.JobName);
+            test1expectedval = info.Data;
+            info.Stop(info.Info.Name);
 
             return null;
 
@@ -117,12 +127,12 @@ namespace FluentScheduler.UnitTests
         public int test2ActionTimers = 0;
         public string test2expectedval = "";
         public string test1expectedval = "";
-        private void Test2(RhemaJobEndInfo info, object val)
+        private void Test2(JobEndData<string> info)
         {
             test2ActionTimers++;
-            test2expectedval = val.ToString();
+            test2expectedval = info.Data;
           
-            info.Stop(info.JobName);
+            info.Stop(info.Info.Name);
 
         }
 

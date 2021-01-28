@@ -7,30 +7,33 @@ using FluentScheduler;
 
 namespace Rhema.FluentScheduler
 {
-    public class RhemaJobEndInfo : JobEndInfo
+    public interface IJobData<T>
+    {
+
+        string Name { get; set; }
+        T Data { get; set; }
+    }
+
+    public abstract class JobInfo<T>
+    {
+        public T Info { get; set; }
+
+
+    }
+    public class JobEndData<T> : JobInfo<JobEndInfo>, IJobData<T>
     {
         public string Name { get; set; }
-        public string JobName { get; }
-
-        public DateTime StartTime { get; }
-
-        public TimeSpan Duration { get; }
-
-        public DateTime? NextRun { get; }
-        public RhemaJobEndInfo(JobEndInfo innerInfo)
-        {
-            if (innerInfo != null)
-            {
-                NextRun = innerInfo.NextRun;
-                StartTime = innerInfo.StartTime;
-                JobName = innerInfo.Name;
-                Duration = innerInfo.Duration;
-            }
-        }
-        public RhemaJobEndInfo(string innerInfo)
-        {
-            Name = innerInfo;
-        }
+        public T Data { get; set; }
     }
-    public class RhemaJobExceptionInfo : JobExceptionInfo { }
+    public class JobStartData<T> : JobInfo<JobStartInfo>, IJobData<T>
+    {
+        public string Name { get; set; }
+        public T Data { get; set; }
+    }
+    public class JobExceptionData<T> : JobInfo<JobExceptionInfo>, IJobData<T>
+    {
+        public string Name { get; set; }
+        public T Data { get; set; }
+    }
+
 }

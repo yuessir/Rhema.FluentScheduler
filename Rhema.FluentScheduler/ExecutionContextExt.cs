@@ -11,23 +11,14 @@ namespace Rhema.FluentScheduler
     public static class ExecutionContextExt
     {
 
-        public static void StopAll(
-            this RhemaJobEndInfo info)
-
+        public static void StopAll<T>(
+            this JobInfo<T> info)
         {
-            foreach (var schedule in JobManager.AllSchedules)
-            {
-                if (schedule.Name == info.Name)
-                {
-                    schedule.Disable();
-                    JobManager.RemoveJob(info.Name);
-                }
-            }
-
+            JobManager.StopAndBlock();
         }
 
-        public static void Stop(
-            this RhemaJobEndInfo info, string jobName)
+        public static void Stop<T>(
+            this JobInfo<T> info, string jobName)
 
         {
             var schedule = JobManager.GetSchedule(jobName);
