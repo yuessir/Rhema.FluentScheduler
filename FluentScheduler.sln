@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FluentScheduler.UnitTests",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rhema.FluentScheduler", "Rhema.FluentScheduler\Rhema.FluentScheduler.csproj", "{3FE5FE60-C2CB-49DC-BCA6-5CF88048CAFD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rhema.FluentScheduler.AppTEST", "Rhema.FluentScheduler.AppTEST\Rhema.FluentScheduler.AppTEST.csproj", "{1457D96A-D159-4D5B-A5F5-4A988847C59F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{3FE5FE60-C2CB-49DC-BCA6-5CF88048CAFD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3FE5FE60-C2CB-49DC-BCA6-5CF88048CAFD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3FE5FE60-C2CB-49DC-BCA6-5CF88048CAFD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1457D96A-D159-4D5B-A5F5-4A988847C59F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1457D96A-D159-4D5B-A5F5-4A988847C59F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1457D96A-D159-4D5B-A5F5-4A988847C59F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1457D96A-D159-4D5B-A5F5-4A988847C59F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
