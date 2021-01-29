@@ -50,7 +50,7 @@ namespace FluentScheduler.UnitTests
             // Act
             eng .AddJob(() =>
                 {
-                  //nothing
+                    Thread.Sleep(1000 * 15);
                 },
                 s => s.WithName("TestJob7").ToRunNow().DelayFor(1).Minutes());
         
@@ -69,7 +69,7 @@ namespace FluentScheduler.UnitTests
             // Act
             eng.AddJob(() =>
                 {
-                    //nothing
+                    Thread.Sleep(1000 * 15);
                 },
                 s => s.WithName("TestJob8").ToRunNow()).JobEnd(new JobEndData<string>() { Data = "1" }, Test1);
             eng.Run();
@@ -87,10 +87,12 @@ namespace FluentScheduler.UnitTests
             // Act
             eng.AddJob(() =>
                 {
-                    //nothing
+                    Thread.Sleep(1000 * 15);
                 },
-                s => s.ToRunOnceIn(60).Seconds()).JobEnd(new JobEndData<string>() { Data = "1" }, Test1);
+                s => s.ToRunOnceIn(30).Seconds()).JobEnd(new JobEndData<string>() { Data = "1" }, Test1);
+            Thread.Sleep(1000 * 33);
             eng.Run();
+          
 
             eng.Stop();
 
@@ -105,12 +107,12 @@ namespace FluentScheduler.UnitTests
             // Act
             eng.AddJob(() =>
                 {
-                    //nothing
+                    Thread.Sleep(1000 * 15);
                 },
                 s => s.ToRunNow()).JobEnd(new JobEndData<string>() { Data = "1" }, Test1);
             eng.Run();
-
-
+            
+           
             eng.Stop();
             //Assert
             Equal("1", test1expectedval);

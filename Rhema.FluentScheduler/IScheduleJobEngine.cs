@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using FluentScheduler;
 using Serilog;
 
@@ -11,7 +12,7 @@ namespace Rhema.FluentScheduler
     {
         IScheduleJobEngine Run();
         IScheduleJobEngine Stop();
-     
+
         /// <summary>
         /// 手動執行排成 Manual Job >>need to RUN();
         /// </summary>
@@ -28,16 +29,17 @@ namespace Rhema.FluentScheduler
         private ILogger _logger;
         private object _startArgs;
         private object _endArgs;
-    
+
         public ScheduleJobEngine(ILogger logger)
         {
             _logger = logger;
         }
 
-        
+
         public IScheduleJobEngine AddJob(Action job, Action<Schedule> schedule)
         {
             AddJob(schedule, new Schedule(job));
+
             return this;
         }
         private string _excuteContextName;
@@ -50,27 +52,36 @@ namespace Rhema.FluentScheduler
         {
             if (schedule.Name == null)
             {
-                
+
                 schedule.WithName(Guid.NewGuid().ToString());
             }
-
-            jobSchedule(schedule);
-            if (schedule.NextRun==default(DateTime))
-            {
-                schedule.ToRunNow().DelayFor(1).Milliseconds();
-
-
-            }
             var ty = typeof(JobManager);
+            jobSchedule(schedule);
+            if (schedule.NextRun == default(DateTime))
+            {
+                var prop = schedule.GetType().GetProperty("DelayRunFor", BindingFlags.Instance |
+                                                                         BindingFlags.NonPublic);
+                var propVal = prop.GetValue(schedule);
+                if ((TimeSpan)propVal==TimeSpan.Zero)
+                {
+                    schedule.ToRunNow().DelayFor(1).Milliseconds();
+                }
+            }
+
             var n = new Schedule[] { schedule };
             var fun = ty.GetMethod("CalculateNextRun", BindingFlags.Static | BindingFlags.NonPublic);
             var list = fun.Invoke(null, new object[] { n });
             var list2 = ((IEnumerable<Schedule>)list).ToList();
-            
-            if (schedule.NextRun< DateTime.Now)
+            if (schedule.NextRun < DateTime.Now)
             {
+                //DO NOT RUN JOB
             }
-          
+            else
+            {
+                var fun2 = ty.GetMethod("ScheduleJobs", BindingFlags.Static | BindingFlags.NonPublic);
+                fun2.Invoke(null, null);
+            }
+
             SetExcuteContextName(schedule);
 
 
@@ -78,14 +89,7 @@ namespace Rhema.FluentScheduler
 
         public IScheduleJobEngine Run()
         {
-            var running = JobManager.RunningSchedules;
-            var all = JobManager.AllSchedules;
-            foreach (var restSchedule in all.Except(running))
-            {
-
-                restSchedule.Execute();
-            }
-
+            JobManager.Start();
             return this;
         }
         public IScheduleJobEngine RemoveJob(string name)
@@ -104,7 +108,7 @@ namespace Rhema.FluentScheduler
 
         private static event Action<JobEndInfo> JobEndHandler;
         private static Dictionary<string, object> _map = new Dictionary<string, object>();
-      
+
         public IExecutionContext JobEnd<T>(JobEndData<T> endArgs, Func<JobEndData<T>, object> func = null)
         {
             if (func == null) return this;
@@ -138,7 +142,7 @@ namespace Rhema.FluentScheduler
             return this;
         }
 
-       
+
 
 
     }
